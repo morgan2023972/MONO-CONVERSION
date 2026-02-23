@@ -4,19 +4,25 @@ on:
   pull_request:
   push:
     branches:
+      - main
       - master
-      - feature/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   theme-check:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - name: Install Theme Check
+        run: gem install theme-check
 
       - name: Run Theme Check
-        uses: shopify/theme-check-action@v2
-        with:
-          theme_root: "."
-          token: ${{ github.token }}
-          base: master
+        run: theme-check
