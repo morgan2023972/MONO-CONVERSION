@@ -1,0 +1,22 @@
+name: Theme Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - feature/**
+
+jobs:
+  theme-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Theme Check
+        uses: shopify/theme-check-action@v2
+        with:
+          theme_root: "."
+          token: ${{ github.token }}
+          base: master
