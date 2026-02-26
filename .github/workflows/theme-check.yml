@@ -2,10 +2,9 @@ name: Theme Check
 
 on:
   pull_request:
+    branches: [master]
   push:
-    branches:
-      - main
-      - master
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -16,13 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.3"
+          ruby-version: "3.2"
 
       - name: Install Theme Check
         run: gem install theme-check
 
       - name: Run Theme Check
-        run: theme-check
+        run: theme-check -C .theme-check.yml
