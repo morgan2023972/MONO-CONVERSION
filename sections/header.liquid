@@ -3,15 +3,36 @@
     {{ shop.name | link_to: routes.root_url }}
   </h2>
 
-  <div class="header__menu">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+  {% assign is_funnel_template = false %}
+  {% if template.name == 'index' %}
+    {% assign is_funnel_template = true %}
+  {% endif %}
+  {% if template.name == 'product' %}
+    {% assign is_funnel_template = true %}
+  {% endif %}
+  {% if template.name == 'cart' %}
+    {% assign is_funnel_template = true %}
+  {% endif %}
+  {% assign use_minimal_header = false %}
+  {% if settings.funnel_mode_enabled %}
+    {% if is_funnel_template %}
+      {% assign use_minimal_header = true %}
+    {% endif %}
+  {% endif %}
+
+  {% unless use_minimal_header %}
+    <div class="header__menu">
+      {% for link in section.settings.menu.links %}
+        {{ link.title | link_to: link.url }}
+      {% endfor %}
+    </div>
+  {% endunless %}
 
   <div class="header__icons">
     {% if shop.customer_accounts_enabled %}
-      {{ 'icon-account.svg' | inline_asset_content | link_to: routes.account_url }}
+      {% unless use_minimal_header %}
+        {{ 'icon-account.svg' | inline_asset_content | link_to: routes.account_url }}
+      {% endunless %}
     {% endif %}
 
     <a href="{{ routes.cart_url }}">
@@ -30,6 +51,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
   }
   header a {
     position: relative;

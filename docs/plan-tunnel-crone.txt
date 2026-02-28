@@ -1,0 +1,26 @@
+Plan (DRAFT): Tunnel Crone Dawn + IA + Brevo
+
+Objectif V1: transformer Dawn en tunnel Landing → Produit → Panier → Checkout, avec copywriting IA en pré-publication (pas temps réel storefront), instrumentation analytics orientée conversion, puis synchronisation CRM Brevo sous contrainte RGPD stricte. Le plan sépare clairement ce qui vit dans le thème (UX funnel, events, consent) et ce qui doit vivre hors thème (service IA + automatisation CRM), car Liquid ne sécurise pas des appels IA/CRM sensibles côté client. Hypothèse de travail: compatibilité Shopify non-Plus (si Plus confirmé, on élargit seulement la phase checkout extensibility).
+
+Steps
+1. Cadrer le tunnel Crone en composants réutilisables dans sections/custom-section.liquid, blocks/group.liquid et blocks/text.liquid, puis définir l’ordre narratif (promesse, preuve, objections, offre, CTA) dans templates/index.json.
+2. Créer une structure “funnel-safe” du thème dans layout/theme.liquid, sections/header.liquid, sections/footer.liquid, sections/header-group.json, sections/footer-group.json pour limiter les distractions sur les pages tunnel.
+3. Renforcer la conversion produit/panier dans sections/product.liquid, templates/product.json, sections/cart.liquid, templates/cart.json avec blocs dédiés Crone (bénéfices, réassurance, urgence soft, bump/offre additionnelle si validée).
+4. Préparer la “couche copy IA pré-publication” via schéma éditorial dans config/settings_schema.json + champs de rendu existants, et brancher la source de copy (Brevo/outil IA) via pipeline hors-thème pour injection contrôlée dans sections/metafields.
+5. Ajouter l’instrumentation analytics funnel dans layout/theme.liquid, sections/product.liquid, sections/cart.liquid avec events normalisés (view_item, add_to_cart, begin_checkout, étapes landing) et mapping vers Brevo (events + attributs contact).
+6. Mettre en place conformité RGPD stricte: conditionner tous tags/events marketing au consentement dans le layout global, documenter la matrice consentement→événements, et préserver un mode mesure minimale non marketing.
+7. Consolider SEO/copy méta funnel dans snippets/meta-tags.liquid pour cohérence promesse-annonce-page et préparer A/B éditorial futur sans refonte technique.
+8. Documenter la runbook d’exploitation (workflow génération IA, validation humaine, publication, suivi KPI) dans docs avec conventions de nommage, SLA d’édition et rollback.
+
+Verification
+- Vérifier manuellement le parcours complet Landing → Produit → Panier → Checkout sur desktop/mobile.
+- Contrôler les événements funnel (ordre, payload, consentement) via console/pixel helper et logs Brevo.
+- Tester 3 scénarios RGPD: refus total, accept analytics only, accept marketing complet.
+- Valider que la copie IA publiée est modifiable sans déploiement code (settings/metafields).
+- Confirmer l’absence de régression SEO/meta sur pages produit et landing.
+
+Decisions
+- IA copywriting: pré-publication (choisi) plutôt que génération temps réel storefront.
+- Stack CRM/analytics V1: Brevo (choisi) avec tracking funnel orienté conversion.
+- UX funnel V1: Landing → Produit → Panier → Checkout (choisi).
+- Conformité: RGPD + consentement strict dès V1 (choisi).

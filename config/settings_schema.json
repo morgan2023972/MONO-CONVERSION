@@ -79,5 +79,75 @@
         "default": 4
       }
     ]
+  },
+  {
+    "name": "Tunnel & CRM",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "funnel_mode_enabled",
+        "label": "Enable funnel mode",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "analytics_debug",
+        "label": "Enable analytics debug logs",
+        "default": false
+      },
+      {
+        "type": "url",
+        "id": "brevo_event_endpoint",
+        "label": "Brevo event relay endpoint"
+      },
+      {
+        "type": "text",
+        "id": "ai_copy_source",
+        "label": "AI copy source",
+        "default": "pipeline:brevo+ia"
+      },
+      {
+        "type": "text",
+        "id": "ai_copy_last_sync",
+        "label": "AI copy last sync"
+      }
+    ]
+  },
+  {
+    "name": "SEO Funnel",
+    "settings": [
+      {
+        "type": "text",
+        "id": "seo_funnel_home_title",
+        "label": "Funnel home title"
+      },
+      {
+        "type": "textarea",
+        "id": "seo_funnel_home_description",
+        "label": "Funnel home description"
+      },
+      {
+        "type": "text",
+        "id": "seo_funnel_product_title_suffix",
+        "label": "Product title suffix",
+        "default": "Offre exclusive"
+      },
+      {
+        "type": "textarea",
+        "id": "seo_funnel_product_description",
+        "label": "Product fallback description"
+      },
+      {
+        "type": "checkbox",
+        "id": "seo_noindex_cart",
+        "label": "Noindex cart page",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "seo_funnel_og_image",
+        "label": "Funnel social image"
+      }
+    ]
   }
 ]

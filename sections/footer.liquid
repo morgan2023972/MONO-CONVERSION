@@ -1,23 +1,44 @@
 <footer>
+  {% assign is_funnel_template = false %}
+  {% if template.name == 'index' %}
+    {% assign is_funnel_template = true %}
+  {% endif %}
+  {% if template.name == 'product' %}
+    {% assign is_funnel_template = true %}
+  {% endif %}
+  {% if template.name == 'cart' %}
+    {% assign is_funnel_template = true %}
+  {% endif %}
+  {% assign use_minimal_footer = false %}
+  {% if settings.funnel_mode_enabled %}
+    {% if is_funnel_template %}
+      {% assign use_minimal_footer = true %}
+    {% endif %}
+  {% endif %}
+
   <div class="footer__copyright">
     &copy;
     {{ 'now' | date: '%Y' }}
     {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
   </div>
 
-  <div class="footer__links">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
-
-  <div class="footer__payment">
-    {% if section.settings.show_payment_icons %}
-      {% for type in shop.enabled_payment_types %}
-        {{ type | payment_type_svg_tag }}
+  {% unless use_minimal_footer %}
+    <div class="footer__links">
+      {% for link in section.settings.menu.links %}
+        {{ link.title | link_to: link.url }}
       {% endfor %}
-    {% endif %}
-  </div>
+    </div>
+  {% endunless %}
+
+  {% unless use_minimal_footer %}
+    <div class="footer__payment">
+      {% if section.settings.show_payment_icons %}
+        {% for type in shop.enabled_payment_types %}
+          {{ type | payment_type_svg_tag }}
+        {% endfor %}
+      {% endif %}
+    </div>
+  {% endunless %}
 </footer>
 
 {% stylesheet %}

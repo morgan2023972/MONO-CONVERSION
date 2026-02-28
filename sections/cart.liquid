@@ -6,6 +6,9 @@
 {% endcomment %}
 
 <h1>{{ 'cart.title' | t }}</h1>
+{% if section.settings.cart_reassurance != blank %}
+  <p>{{ section.settings.cart_reassurance }}</p>
+{% endif %}
 
 <form action="{{ routes.cart_url }}" method="post">
   <table>
@@ -26,12 +29,60 @@
     {% endfor %}
   </table>
 
-  <input type="submit" name="checkout" value="{{ 'cart.checkout' | t }}">
+  <input type="submit" name="checkout" value="{{ section.settings.checkout_label }}">
 </form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.dispatchEvent(
+      new CustomEvent('mono:funnel-track', {
+        detail: {
+          eventName: 'view_cart',
+          payload: {
+            funnel_step: 'cart',
+            cart_item_count: {{ cart.item_count | json }},
+            cart_total: {{ cart.total_price | money_without_currency | replace: ',', '.' | plus: 0 | json }}
+          }
+        }
+      })
+    );
+
+    var checkoutButton = document.querySelector('input[name="checkout"]');
+    if (checkoutButton) {
+      checkoutButton.addEventListener('click', function () {
+        document.dispatchEvent(
+          new CustomEvent('mono:funnel-track', {
+            detail: {
+              eventName: 'begin_checkout',
+              payload: {
+                funnel_step: 'cart',
+                cart_item_count: {{ cart.item_count | json }},
+                cart_total: {{ cart.total_price | money_without_currency | replace: ',', '.' | plus: 0 | json }}
+              }
+            }
+          })
+        );
+      });
+    }
+  });
+</script>
 
 {% schema %}
 {
   "name": "t:general.cart",
-  "settings": []
+  "settings": [
+    {
+      "type": "text",
+      "id": "cart_reassurance",
+      "label": "Cart reassurance",
+      "default": "Paiement sécurisé et support disponible en cas de besoin."
+    },
+    {
+      "type": "text",
+      "id": "checkout_label",
+      "label": "Checkout label",
+      "default": "Continuer vers le paiement"
+    }
+  ]
 }
 {% endschema %}
