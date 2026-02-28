@@ -14,7 +14,21 @@
 <div class="product-info">
   <h1>{{ product.title }}</h1>
   <p>{{ product.price | money }}</p>
-  <p>{{ product.description }}</p>
+  <p>
+    {% if product.metafields.custom.crone_product_intro != blank %}
+      {{ product.metafields.custom.crone_product_intro }}
+    {% else %}
+      {{ product.description }}
+    {% endif %}
+  </p>
+
+  {% if section.settings.reassurance_text != blank %}
+    <p class="product-reassurance">{{ section.settings.reassurance_text }}</p>
+  {% endif %}
+
+  {% if section.settings.objection_text != blank %}
+    <p class="product-objection">{{ section.settings.objection_text }}</p>
+  {% endif %}
 </div>
 
 <div class="product-form">
@@ -36,15 +50,81 @@
 
     <input type="text" name="quantity" min="1" value="1">
 
-    <input type="submit" value="Add to cart">
+    <input type="submit" value="{{ section.settings.add_to_cart_label }}">
     {{ form | payment_button }}
   {% endform %}
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.dispatchEvent(
+      new CustomEvent('mono:funnel-track', {
+        detail: {
+          eventName: 'view_item',
+          payload: {
+            funnel_step: 'product',
+            product_id: {{ product.id | json }},
+            product_title: {{ product.title | json }},
+            product_price: {{ product.price | money_without_currency | replace: ',', '.' | plus: 0 | json }}
+          }
+        }
+      })
+    );
+
+    var productForms = document.querySelectorAll('form[action^="/cart/add"]');
+    productForms.forEach(function (formElement) {
+      formElement.addEventListener('submit', function () {
+        document.dispatchEvent(
+          new CustomEvent('mono:funnel-track', {
+            detail: {
+              eventName: 'add_to_cart',
+              payload: {
+                funnel_step: 'product',
+                product_id: {{ product.id | json }},
+                product_title: {{ product.title | json }}
+              }
+            }
+          })
+        );
+      });
+    });
+  });
+</script>
+
+{% stylesheet %}
+  .product-reassurance,
+  .product-objection {
+    margin: 0.75rem 0 0;
+  }
+
+  .product-form {
+    margin-top: 1rem;
+  }
+{% endstylesheet %}
+
 {% schema %}
 {
   "name": "t:general.product",
-  "settings": [],
+  "settings": [
+    {
+      "type": "text",
+      "id": "reassurance_text",
+      "label": "Reassurance text",
+      "default": "Garantie satisfaction 30 jours."
+    },
+    {
+      "type": "text",
+      "id": "objection_text",
+      "label": "Objection handling",
+      "default": "Pas besoin d’expertise technique pour démarrer."
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_label",
+      "label": "Add to cart label",
+      "default": "Ajouter au panier"
+    }
+  ],
   "disabled_on": {
     "groups": ["header", "footer"]
   }

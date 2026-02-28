@@ -1,0 +1,193 @@
+{% comment %}
+  Landing section for Crone sales funnel strategy.
+{% endcomment %}
+
+<section
+  class="crone-funnel"
+  style="
+    --section-padding: {{ section.settings.section_padding }}px;
+    --section-gap: {{ section.settings.section_gap }}px;
+  "
+>
+  <div class="crone-funnel__container">
+    <p class="crone-funnel__eyebrow">{{ section.settings.eyebrow }}</p>
+    <h1 class="crone-funnel__headline">{{ section.settings.headline }}</h1>
+    <p class="crone-funnel__subheadline">{{ section.settings.subheadline }}</p>
+
+    <div class="crone-funnel__proof">
+      <p>{{ section.settings.proof_1 }}</p>
+      <p>{{ section.settings.proof_2 }}</p>
+      <p>{{ section.settings.proof_3 }}</p>
+    </div>
+
+    <div class="crone-funnel__offer">
+      <h2>{{ section.settings.offer_title }}</h2>
+      <p>{{ section.settings.offer_text }}</p>
+    </div>
+
+    <a class="crone-funnel__cta" href="{{ section.settings.cta_url }}">{{ section.settings.cta_label }}</a>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.dispatchEvent(
+      new CustomEvent('mono:funnel-track', {
+        detail: {
+          eventName: 'landing_view',
+          payload: {
+            funnel_step: 'landing',
+            section_id: {{ section.id | json }}
+          }
+        }
+      })
+    );
+  });
+</script>
+
+{% stylesheet %}
+  .crone-funnel {
+    padding: var(--section-padding) 0;
+  }
+
+  .crone-funnel__container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+    max-width: min(65ch, 100%);
+    margin: 0 auto;
+  }
+
+  .crone-funnel__eyebrow {
+    margin: 0;
+    opacity: 0.75;
+  }
+
+  .crone-funnel__headline {
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .crone-funnel__subheadline {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .crone-funnel__proof {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .crone-funnel__proof p,
+  .crone-funnel__offer p {
+    margin: 0;
+  }
+
+  .crone-funnel__offer h2 {
+    margin: 0 0 0.5rem;
+  }
+
+  .crone-funnel__cta {
+    width: fit-content;
+    text-decoration: none;
+    border: 1px solid currentColor;
+    border-radius: var(--input-corner-radius);
+    padding: 0.75rem 1.25rem;
+  }
+
+  .crone-funnel__cta:hover {
+    opacity: 0.85;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Crone funnel",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Méthode Crone"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Transformez votre offre en tunnel de vente clair et rentable"
+    },
+    {
+      "type": "textarea",
+      "id": "subheadline",
+      "label": "Subheadline",
+      "default": "Structurez votre parcours client de la promesse au checkout avec une narration orientée conversion."
+    },
+    {
+      "type": "text",
+      "id": "proof_1",
+      "label": "Proof 1",
+      "default": "✓ Positionnement lisible en moins de 5 secondes"
+    },
+    {
+      "type": "text",
+      "id": "proof_2",
+      "label": "Proof 2",
+      "default": "✓ Argumentaire orienté objections et bénéfices"
+    },
+    {
+      "type": "text",
+      "id": "proof_3",
+      "label": "Proof 3",
+      "default": "✓ Parcours de conversion instrumenté pour analytics"
+    },
+    {
+      "type": "text",
+      "id": "offer_title",
+      "label": "Offer title",
+      "default": "Offre principale"
+    },
+    {
+      "type": "textarea",
+      "id": "offer_text",
+      "label": "Offer text",
+      "default": "Commencez avec une architecture funnel prête pour vos optimisations CRM et copywriting IA."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Voir l’offre"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA URL"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section padding",
+      "min": 16,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "section_gap",
+      "label": "Section gap",
+      "min": 8,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "Crone funnel"
+    }
+  ]
+}
+{% endschema %}

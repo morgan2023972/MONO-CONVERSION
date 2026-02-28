@@ -1,0 +1,213 @@
+openapi: 3.0.3
+info:
+  title: MONO Conversion Relay API
+  version: 1.0.0
+  description: |
+    API de relay des événements funnel Shopify vers pipeline CRM (Brevo).
+    Cette API ingère les événements frontend, valide le schéma, applique idempotence,
+    puis met en file pour traitement asynchrone.
+servers:
+  - url: https://relay.example.com
+    description: Production
+  - url: https://staging-relay.example.com
+    description: Staging
+
+tags:
+  - name: Events
+    description: Ingestion d'événements funnel
+
+paths:
+  /v1/events:
+    post:
+      tags:
+        - Events
+      summary: Ingest funnel event
+      operationId: ingestEvent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventIngestionRequest'
+            examples:
+              beginCheckout:
+                summary: Begin checkout event
+                value:
+                  event: begin_checkout
+                  shop: mono-conversion.myshopify.com
+                  template: cart
+                  timestamp: '2026-02-27T14:12:00.000Z'
+                  funnel_step: cart
+                  cart_item_count: 2
+                  cart_total: 149.9
+                  session_id: sess_abc123
+                  visitor_id: vis_def456
+      responses:
+        '202':
+          description: Accepted for async processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcceptedResponse'
+              example:
+                status: accepted
+                request_id: req_01HZZYQK7W4E3NP8S2F8P6D6SX
+                idempotency_key: 2f0e8f6f2f30f6f532f89f3e95a9f00c2a7762dcb2f7fca2
+                received_at: '2026-02-27T14:12:01.120Z'
+        '400':
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Duplicate event (idempotency conflict)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    EventType:
+      type: string
+      enum:
+        - funnel_page_view
+        - landing_view
+        - view_item
+        - add_to_cart
+        - view_cart
+        - begin_checkout
+
+    EventIngestionRequest:
+      type: object
+      required:
+        - event
+        - shop
+        - template
+        - timestamp
+        - funnel_step
+      properties:
+        event:
+          $ref: '#/components/schemas/EventType'
+        shop:
+          type: string
+          minLength: 3
+          example: mono-conversion.myshopify.com
+        template:
+          type: string
+          example: product
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-02-27T14:12:00.000Z'
+        funnel_step:
+          type: string
+          enum:
+            - landing
+            - product
+            - cart
+            - checkout
+        session_id:
+          type: string
+          maxLength: 128
+        visitor_id:
+          type: string
+          maxLength: 128
+        page_title:
+          type: string
+          maxLength: 300
+        page_path:
+          type: string
+          maxLength: 500
+        section_id:
+          type: string
+          maxLength: 128
+        product_id:
+          oneOf:
+            - type: integer
+            - type: string
+        product_title:
+          type: string
+          maxLength: 500
+        product_price:
+          type: number
+          format: double
+          minimum: 0
+        cart_item_count:
+          type: integer
+          minimum: 0
+        cart_total:
+          type: number
+          format: double
+          minimum: 0
+        consent_analytics:
+          type: boolean
+          description: Optionnel, utile pour audit et double vérification backend
+      additionalProperties: true
+
+    AcceptedResponse:
+      type: object
+      required:
+        - status
+        - request_id
+        - idempotency_key
+        - received_at
+      properties:
+        status:
+          type: string
+          enum: [accepted]
+        request_id:
+          type: string
+          example: req_01HZZYQK7W4E3NP8S2F8P6D6SX
+        idempotency_key:
+          type: string
+          example: 2f0e8f6f2f30f6f532f89f3e95a9f00c2a7762dcb2f7fca2
+        received_at:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: invalid_payload
+        message:
+          type: string
+          example: Missing required field: event
+        request_id:
+          type: string
+        details:
+          type: array
+          items:
+            type: string

@@ -1,0 +1,249 @@
+TRANSCRIPTION DE CONVERSATION (chronologique)
+Date de génération: 27/02/2026
+Projet: MONO-CONVERSION
+
+Remarque: cette transcription reprend les échanges utilisateur/assistant de cette session de travail dans le workspace.
+
+----------------------------------------------------------------
+UTILISATEUR:
+a partir de ce theme dawn (shopify) construire un theme tunnel de vente (strategie crone)avec ia native pour copywriting et automatisation CRM (analytics)
+
+ASSISTANT:
+- Discovery du thème et cadrage des contraintes.
+- Questions de clarification posées (V1 tunnel, IA, stack CRM, plan Shopify, conformité).
+
+UTILISATEUR (réponses):
+- Crone V1: Landing → Produit → Panier → Checkout
+- IA Copy: Génération en back-office (pré-publication)
+- CRM Stack: Brevo
+- Conformité: RGPD + consentement strict
+
+ASSISTANT:
+- Plan détaillé rédigé (draft) pour tunnel Crone + IA + Brevo.
+
+----------------------------------------------------------------
+UTILISATEUR:
+colle ce plan dans un fichier texte dans le dossier docs
+
+ASSISTANT:
+- Création du fichier docs/plan-tunnel-crone.txt avec le plan complet.
+
+----------------------------------------------------------------
+UTILISATEUR:
+Start implementation
+
+ASSISTANT (implémentation Phase 1):
+- Création/confirmation plan dans docs.
+- Modifs thème:
+  - layout/theme.liquid: mode funnel + tracking consent-aware + relay Brevo
+  - sections/header.liquid: header simplifié en mode funnel
+  - sections/footer.liquid: footer simplifié en mode funnel
+  - sections/crone-funnel.liquid: landing funnel dédiée
+  - sections/product.liquid: copy funnel + tracking view_item/add_to_cart
+  - sections/cart.liquid: réassurance + tracking view_cart/begin_checkout
+  - templates/index.json: section crone-funnel
+  - config/settings_schema.json: settings Tunnel & CRM
+- Vérification erreurs: OK.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase  2:runbook d'exploitation
+
+ASSISTANT (Phase 2):
+- Création docs/runbook-exploitation-crone-brevo.md
+- Contenu: exploitation V1, process IA pré-publication, mapping events, RGPD, recette, monitoring, incident/rollback.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase 3
+
+ASSISTANT (Phase 3):
+- Création docs/brevo-event-mapping-v1.md
+- Mapping backend-ready: contrat d’entrée relay, taxonomie events, mapping Brevo, identité, idempotence, RGPD, workflows.
+- MAJ runbook pour référencer ce document.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase 4
+
+ASSISTANT (Phase 4):
+- Création docs/relay-api-openapi-v1.yaml
+- OpenAPI endpoint POST /v1/events + schémas + erreurs + sécurité Bearer.
+- Référence ajoutée dans docs/brevo-event-mapping-v1.md.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase 5
+
+ASSISTANT (Phase 5):
+- Scaffold backend relay/ (Node.js):
+  - relay/package.json
+  - relay/.env.example
+  - relay/README.md
+  - relay/src/config.js
+  - relay/src/idempotencyStore.js
+  - relay/src/validator.js
+  - relay/src/transform.js
+  - relay/src/brevoClient.js (stub initial)
+  - relay/src/app.js (API /health + /v1/events)
+- Validation fichiers: OK.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase 6
+
+ASSISTANT (Phase 6):
+- Brevo HTTP réel implémenté (brevoClient.js)
+- Refactor app.js (createApp testable)
+- Ajout tests:
+  - relay/test/app.test.js
+  - relay/test/brevoClient.test.js
+- MAJ README et scripts test.
+- Exécution tests: PASS.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase 7
+
+ASSISTANT (Phase 7):
+- Ajout Redis idempotency:
+  - relay/src/redisIdempotencyStore.js
+  - dépendance redis
+- Ajout DLQ fichier:
+  - relay/src/dlqWriter.js
+  - app.js écrit en DLQ sur échec Brevo
+- MAJ .env/config/README/tests.
+- Tests: PASS.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase 8 en documentant
+
+ASSISTANT (Phase 8):
+- Replay DLQ CLI avec backoff:
+  - relay/src/dlqReplay.js
+  - script npm replay:dlq
+- MAJ README (procédure replay, stratégie retry).
+- Ajout tests relay/test/dlqReplay.test.js
+- Tests: PASS.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase 9en documentant
+
+ASSISTANT (Phase 9):
+- Reporting d’exploitation replay:
+  - relay/src/replayReportWriter.js
+  - dlqReplay.js enrichi (summary + durée + écriture report)
+- MAJ .env/config/README (planification Task Scheduler/cron + rapport quotidien).
+- Tests: PASS.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase 10
+
+ASSISTANT (Phase 10):
+- KPI journalier:
+  - relay/src/dlqDailyReport.js
+  - script npm report:daily
+- MAJ .env/config/README
+- Ajout tests relay/test/dlqDailyReport.test.js
+- Tests: PASS.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase 11 en documentant
+
+ASSISTANT (Phase 11):
+- KPI hebdo + export CSV:
+  - relay/src/dlqKpiExport.js
+  - scripts npm report:weekly / report:csv
+- MAJ .env/config/README
+- Ajout tests relay/test/dlqKpiExport.test.js
+- Tests: PASS.
+
+----------------------------------------------------------------
+UTILISATEUR:
+phase 12 en documentant
+
+ASSISTANT (Phase 12):
+- Executive summary Markdown hebdo:
+  - relay/src/dlqExecutiveSummary.js
+  - script npm report:summary
+- MAJ .env/config/README
+- Ajout tests relay/test/dlqExecutiveSummary.test.js
+- Tests: PASS.
+
+----------------------------------------------------------------
+UTILISATEUR:
+je souhaite que tu verifie dans readme les phases qui manquent pour la documentation et que tu ajoute la documentation des phases manquantes
+
+ASSISTANT:
+- Audit README relay.
+- Ajout des phases manquantes explicites: Phase 5, 6, 7.
+- Harmonisation section couverture + variables.
+
+----------------------------------------------------------------
+UTILISATEUR:
+une table des matieres en haut du readme
+
+ASSISTANT:
+- Ajout table des matières cliquable en haut de relay/README.md.
+
+----------------------------------------------------------------
+UTILISATEUR:
+le plan est -il terminé?
+
+ASSISTANT:
+- Réponse: globalement terminé, avec mention d’un reste possible sur raffinement SEO/meta.
+
+----------------------------------------------------------------
+UTILISATEUR:
+finalise la partie SEO
+
+ASSISTANT:
+- MAJ config/settings_schema.json (bloc SEO Funnel)
+- MAJ snippets/meta-tags.liquid:
+  - titles/descriptions funnel home/product
+  - robots panier noindex configurable
+  - OG/Twitter améliorés + fallback image
+  - canonical conservé
+- Validation: OK.
+
+----------------------------------------------------------------
+UTILISATEUR:
+ajoute une section seo setup dans le readme
+
+ASSISTANT:
+- Ajout section SEO setup dans relay/README.md
+- MAJ table des matières avec lien SEO setup.
+
+----------------------------------------------------------------
+UTILISATEUR:
+je souhaite lancer le projet sur ma boutique de dev shopify afin de faire les verif visuelles
+
+ASSISTANT:
+- Lancement Shopify theme dev.
+- URLs récupérées:
+  - Preview locale: http://127.0.0.1:9292
+  - Preview boutique: https://maboutiquedev-3.myshopify.com/?preview_theme_id=183712842023
+  - Theme editor: https://maboutiquedev-3.myshopify.com/admin/themes/183712842023/editor?hr=9292
+- Ouverture navigateur intégré.
+
+----------------------------------------------------------------
+UTILISATEUR:
+une checklist de verification visuel a cocher pendant mes tests
+
+ASSISTANT:
+- Création docs/checklist-verification-visuelle.md
+- Checklist à cocher (landing, produit, panier, SEO, analytics, responsive, GO/NO-GO).
+
+----------------------------------------------------------------
+UTILISATEUR:
+je souhaite que tu me colle l'ensemble de cette conversation dans un fichier texte et que tu le mette dans docs
+
+ASSISTANT:
+- Fichier créé: docs/conversation-complete.txt (ce document).
+
+----------------------------------------------------------------
+FIN DE TRANSCRIPTION

@@ -27,10 +27,97 @@
   </head>
 
   <body>
+    {% assign is_funnel_template = false %}
+    {% if template.name == 'index' %}
+      {% assign is_funnel_template = true %}
+    {% endif %}
+    {% if template.name == 'product' %}
+      {% assign is_funnel_template = true %}
+    {% endif %}
+    {% if template.name == 'cart' %}
+      {% assign is_funnel_template = true %}
+    {% endif %}
+
     {% sections 'header-group' %}
 
     {{ content_for_layout }}
 
     {% sections 'footer-group' %}
+
+    <script>
+      window.MONOConversion = window.MONOConversion || {};
+      window.MONOConversion.settings = {
+        funnelModeEnabled: {{ settings.funnel_mode_enabled | json }},
+        analyticsDebug: {{ settings.analytics_debug | json }},
+        brevoEventEndpoint: {{ settings.brevo_event_endpoint | json }},
+        isFunnelTemplate: {{ is_funnel_template | json }}
+      };
+
+      window.dataLayer = window.dataLayer || [];
+
+      window.MONOConversion.canTrackAnalytics = function () {
+        if (!window.Shopify || !window.Shopify.customerPrivacy) {
+          return false;
+        }
+        if (typeof window.Shopify.customerPrivacy.analyticsProcessingAllowed !== 'function') {
+          return false;
+        }
+        return window.Shopify.customerPrivacy.analyticsProcessingAllowed();
+      };
+
+      window.MONOConversion.trackEvent = async function (eventName, payload) {
+        if (!window.MONOConversion.canTrackAnalytics()) {
+          return;
+        }
+
+        var eventPayload = Object.assign(
+          {
+            event: eventName,
+            shop: {{ shop.permanent_domain | json }},
+            template: {{ template.name | json }},
+            timestamp: new Date().toISOString()
+          },
+          payload || {}
+        );
+
+        window.dataLayer.push(eventPayload);
+
+        if (window.MONOConversion.settings.analyticsDebug) {
+          console.info('[MONOConversion]', eventPayload);
+        }
+
+        if (!window.MONOConversion.settings.brevoEventEndpoint) {
+          return;
+        }
+
+        try {
+          await fetch(window.MONOConversion.settings.brevoEventEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(eventPayload)
+          });
+        } catch (error) {
+          if (window.MONOConversion.settings.analyticsDebug) {
+            console.error('[MONOConversion] Brevo relay error', error);
+          }
+        }
+      };
+
+      document.addEventListener('mono:funnel-track', function (event) {
+        if (!event || !event.detail) {
+          return;
+        }
+        window.MONOConversion.trackEvent(event.detail.eventName, event.detail.payload);
+      });
+
+      if (window.MONOConversion.settings.funnelModeEnabled && window.MONOConversion.settings.isFunnelTemplate) {
+        window.MONOConversion.trackEvent('funnel_page_view', {
+          page_title: document.title,
+          page_path: window.location.pathname
+        });
+      }
+    </script>
   </body>
 </html>
